@@ -1,11 +1,13 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
+/* My theme color and font  */
 @theme {
-  --color-primary: #10B981;
-  --color-primary-hover: #059669;
-  --color-secondary: #18181B;
+  --color-brand: #10B981;
+  --color-brand-hover: #059669;
+  --color-brand-secondary: #18181B;
   --font-sans: var(--font-manrope);
   --font-bricolage: var(--font-bricolage);
 }
