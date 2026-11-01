@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Banner from "@/components/Home/Banner";
+import CategorySection from "@/components/Home/CategorySection";
 
 export default function Home() {
   return (
@@ -7,6 +8,7 @@ export default function Home() {
       <Suspense fallback={<div className="w-full h-135 sm:h-145 lg:h-160 bg-zinc-950" />}>
         <Banner />
       </Suspense>
+      <CategorySection />
     </div>
   );
 }

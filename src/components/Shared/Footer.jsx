@@ -18,17 +18,15 @@ const quickLinks = [
   { name: "Explore Studios", href: "/studios" },
   { name: "How It Works", href: "/how-it-works" },
   { name: "About Us", href: "/about" },
-  { name: "List Your Studio", href: "/studios/new" },
-  { name: "Pricing & Plans", href: "/pricing" },
+  { name: "List Your Studio", href: "/add-studio" },
 ];
 
 const studioCategories = [
-  { name: "Photo & Daylight Studios", href: "/studios?category=photo" },
-  { name: "Film & Video Stages", href: "/studios?category=video" },
-  { name: "Podcast & Voiceover Rooms", href: "/studios?category=podcast" },
-  { name: "Dance & Rehearsal Studios", href: "/studios?category=dance" },
-  { name: "Music Recording Suites", href: "/studios?category=music" },
-  { name: "Creative Art Lofts", href: "/studios?category=art" },
+  { name: "Photo Studios", href: "/studios?category=Photo%20Studios" },
+  { name: "Sound Stages", href: "/studios?category=Sound%20Stages" },
+  { name: "Podcast Rooms", href: "/studios?category=Podcast%20Rooms" },
+  { name: "Music Suites", href: "/studios?category=Music%20Suites" },
+  { name: "Art Workshops", href: "/studios?category=Art%20Workshops" },
 ];
 
 const socialLinks = [
@@ -205,12 +203,7 @@ const Footer = () => {
                 <span>Subscribe</span>
                 <FiArrowRight className="w-4 h-4" />
               </button>
-            </form>
-
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-              <FiShield className="w-3.5 h-3.5 text-brand" />
-              <span>We protect your privacy. No spam, ever.</span>
-            </div>
+            </form>            
           </div>
         </div>
 

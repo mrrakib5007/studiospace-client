@@ -21,8 +21,7 @@ const slides = [
     headline: "Unleash Your Vision in World-Class Production Studios",
     subtext:
       "Book soundproof soundstages, full-service cyclorama walls, and professional cinema lighting rigs by the hour. Tailored for commercial directors, indie filmmakers, and video creators.",
-    image:
-      "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop",
+    image: "/banner/slide-1.jpg",
     features: ["Infinity Cyc Wall", "Pre-rigged 4K/8K Lights", "Soundproof Stages"],
   },
   {
@@ -30,8 +29,7 @@ const slides = [
     headline: "Sunlit Creative Spaces Crafted for Editorial Photography",
     subtext:
       "Discover high-ceiling lofts flooded with pure northern daylight, curated furniture, and seamless backdrop rollers. Elevate your fashion, portrait, and lookbook shoots.",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop",
+    image: "/banner/slide-2.jpg",
     features: ["Floor-to-Ceiling Windows", "Profoto Strobe Kits", "HMU Dressing Rooms"],
   },
   {
@@ -39,8 +37,7 @@ const slides = [
     headline: "Acoustically Tuned Suites for Music & Podcast Production",
     subtext:
       "Record pristine audio with calibrated vocal booths, vintage outboard gear, and 4-camera podcast setups. Instant hourly access with zero long-term commitments.",
-    image:
-      "https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=2070&auto=format&fit=crop",
+    image: "/banner/slide-3.jpg",
     features: ["Acoustically Treated", "Neumann & Shure Mics", "Multi-Cam Video Setup"],
   },
   {
@@ -48,8 +45,7 @@ const slides = [
     headline: "Expansive Wooden Floors for Dance & Rehearsal Movement",
     subtext:
       "Shock-absorbing sprung hardwood floors, floor-to-ceiling mirror walls, and Bluetooth surround sound. The ultimate space for choreography, auditions, and physical workshops.",
-    image:
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2070&auto=format&fit=crop",
+    image: "/banner/slide-4.jpg",
     features: ["Sprung Harlequin Floor", "Full Mirror Walls", "Surround Sound Array"],
   },
 ];
