@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/Shared/Navbar";
 import ThemeProvider from "@/components/ThemeProvider";
+import Footer from "@/components/Shared/Footer";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -34,8 +35,9 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <Navbar />
-          {children}
+          <main className="flex-1">{children}</main>
           <Toaster />
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
