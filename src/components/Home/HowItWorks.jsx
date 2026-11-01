@@ -61,10 +61,7 @@ const HowItWorks = () => {
         </div>
 
         {/* 4-Step Interactive Cards Grid */}
-        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Desktop Connecting Line */}
-          <div className="hidden lg:block absolute top-14 left-[12%] right-[12%] h-0.5 bg-linear-to-r from-brand/20 via-brand/40 to-brand/20 z-0 pointer-events-none" />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -108,7 +105,7 @@ const HowItWorks = () => {
         <div className="mt-14 sm:mt-16 text-center">
           <Link
             href="/studios"
-            className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl text-sm sm:text-base font-semibold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 active:scale-95 group cursor-pointer"
+            className="inline-flex items-center justify-center gap-2.5 px-8 py-3 rounded-xl text-sm sm:text-base font-semibold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 active:scale-95 group cursor-pointer"
           >
             <span>Start Exploring Studios</span>
             <FiArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
