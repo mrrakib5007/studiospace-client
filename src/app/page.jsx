@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Banner from "@/components/Home/Banner";
 import CategorySection from "@/components/Home/CategorySection";
+import HowItWorks from "@/components/Home/HowItWorks";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
         <Banner />
       </Suspense>
       <CategorySection />
+      <HowItWorks />
     </div>
   );
 }
