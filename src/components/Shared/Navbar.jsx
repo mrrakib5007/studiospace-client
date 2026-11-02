@@ -1,10 +1,13 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useEffect, useSyncExternalStore } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import toast from "react-hot-toast";
+import { useSession, signOut } from "@/lib/auth-client";
 import {
   FiMenu,
   FiX,
@@ -12,6 +15,13 @@ import {
   FiUserPlus,
   FiSun,
   FiMoon,
+  FiUser,
+  FiChevronDown,
+  FiGrid,
+  FiPlusCircle,
+  FiList,
+  FiCalendar,
+  FiLogOut,
 } from "react-icons/fi";
 
 const navLinks = [
@@ -21,12 +31,28 @@ const navLinks = [
   { name: "About Us", href: "/about" },
 ];
 
+const userMenuItems = [
+  { name: "Dashboard", href: "/dashboard", icon: FiGrid },
+  { name: "Add New Studio", href: "/dashboard/add-studio", icon: FiPlusCircle },
+  { name: "My Studio Listings", href: "/dashboard/my-studios", icon: FiList },
+  { name: "My Bookings", href: "/dashboard/my-bookings", icon: FiCalendar },
+];
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme, resolvedTheme } = useTheme();
+
+  // Better-Auth reactive session
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+  const userPhoto = user?.image || user?.photoURL;
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
@@ -47,6 +73,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -59,35 +86,66 @@ const Navbar = () => {
     };
   }, [isOpen]);
 
+  // Handle escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
+      if (e.key === "Escape") {
+        if (isOpen) setIsOpen(false);
+        if (isUserMenuOpen) setIsUserMenuOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, isUserMenuOpen]);
+
+  // Handle click outside to close user dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isActive = (href) => {
     if (href === "/") {
       return pathname === "/";
     }
-    return pathname.startsWith(href);
+    if (pathname === href) {
+      return true;
+    }
+    return pathname.startsWith(href + "/");
+  };
+
+  const handleLogout = async () => {
+    setIsUserMenuOpen(false);
+    setIsOpen(false);
+    try {
+      await signOut();
+      toast.success("Logged out successfully");      
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("Failed to log out");
+    }
   };
 
   return (
     <>
+      {/* Sticky Header with Backdrop Blur and Active Route Indicators */}
       <header
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+        className={`sticky top-0 z-40 w-full py-3.5 transition-all duration-300 ${
           isScrolled
-            ? "bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shadow-xs border-b border-zinc-200/80 dark:border-zinc-800 py-3"
-            : "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-sm border-b border-zinc-100 dark:border-zinc-800/80 py-4"
+            ? "bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shadow-xs border-b border-zinc-200/80 dark:border-zinc-800"
+            : "bg-white/90 dark:bg-zinc-950/90 backdrop-blur-sm border-b border-zinc-100 dark:border-zinc-800/80"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
+            {/* Logo */}
             <Link
               href="/"
               className="group flex items-center gap-2.5 focus:outline-none"
@@ -106,6 +164,7 @@ const Navbar = () => {
               </span>
             </Link>
 
+            {/* Desktop Navigation with Active Route Indicators */}
             <nav className="hidden md:flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
@@ -128,7 +187,9 @@ const Navbar = () => {
               })}
             </nav>
 
+            {/* Desktop Right Actions (Theme Toggle & Auth State) */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Theme Toggle */}
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -156,20 +217,160 @@ const Navbar = () => {
                 )}
               </button>
 
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-semibold border border-brand text-brand hover:bg-brand/5 dark:hover:bg-brand/10 transition-colors duration-200 rounded-lg"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand hover:bg-brand-hover rounded-lg shadow-sm hover:shadow-md hover:shadow-brand/20 transition-all duration-200 active:scale-95"
-              >                
-                <span>Register</span>
-              </Link>
+              {/* Authentication State */}
+              {isPending ? (
+                // Skeleton loader while session is being resolved
+                <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+              ) : user ? (
+                // User Avatar and Dropdown on Hover/Click
+                <div
+                  ref={userMenuRef}
+                  className="relative"
+                  onMouseEnter={() => setIsUserMenuOpen(true)}
+                  onMouseLeave={() => setIsUserMenuOpen(false)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                    className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:border-brand/40 dark:hover:border-brand/40 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all focus:outline-none cursor-pointer"
+                    aria-expanded={isUserMenuOpen}
+                    aria-haspopup="true"
+                  >
+                    {userPhoto ? (
+                      <img
+                        src={userPhoto}
+                        alt={user.name || "User Avatar"}
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-brand/30"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          if (e.target.nextElementSibling) {
+                            e.target.nextElementSibling.style.display = "flex";
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={`w-8 h-8 rounded-full bg-brand/10 text-brand font-bold text-xs items-center justify-center ring-2 ring-brand/30 ${
+                        userPhoto ? "hidden" : "flex"
+                      }`}
+                    >
+                      {user.name ? (
+                        user.name.charAt(0).toUpperCase()
+                      ) : (
+                        <FiUser className="w-4 h-4" />
+                      )}
+                    </div>
+
+                    <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 max-w-25 truncate">
+                      {user.name?.split(" ")[0] || "Account"}
+                    </span>
+                    <FiChevronDown
+                      className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${
+                        isUserMenuOpen ? "rotate-180 text-brand" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-xl shadow-zinc-200/50 dark:shadow-none py-2 z-50">
+                      {/* User Info Header */}
+                      <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
+                        <div className="flex items-center gap-3">
+                          {userPhoto ? (
+                            <img
+                              src={userPhoto}
+                              alt={user.name || "User"}
+                              className="w-10 h-10 rounded-full object-cover ring-2 ring-brand/20"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-brand/10 text-brand font-bold text-sm flex items-center justify-center ring-2 ring-brand/20">
+                              {user.name ? (
+                                user.name.charAt(0).toUpperCase()
+                              ) : (
+                                <FiUser className="w-5 h-5" />
+                              )}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                              {user.name || "User"}
+                            </p>
+                            {user.email && (
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                                {user.email}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dropdown Items */}
+                      <div className="py-1.5">
+                        {userMenuItems.map((item) => {
+                          const active = isActive(item.href);
+                          const Icon = item.icon;
+                          return (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className={`flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
+                                active
+                                  ? "text-brand bg-brand/10 font-semibold"
+                                  : "text-zinc-700 dark:text-zinc-300 hover:text-brand hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Icon
+                                  className={`w-4 h-4 ${
+                                    active ? "text-brand" : "text-zinc-400"
+                                  }`}
+                                />
+                                <span>{item.name}</span>
+                              </div>
+                              {active && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+
+                      {/* Logout Button */}
+                      <div className="pt-1 mt-1 border-t border-zinc-100 dark:border-zinc-800">
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                        >
+                          <FiLogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Guest Actions
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-sm font-semibold border border-brand text-brand hover:bg-brand/5 dark:hover:bg-brand/10 transition-colors duration-200 rounded-lg"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand hover:bg-brand-hover rounded-lg shadow-sm hover:shadow-md hover:shadow-brand/20 transition-all duration-200 active:scale-95"
+                  >
+                    <span>Register</span>
+                  </Link>
+                </div>
+              )}
             </div>
 
+            {/* Mobile Actions (Theme Toggle & Menu Hamburger) */}
             <div className="flex md:hidden items-center gap-1.5">
               <button
                 type="button"
@@ -212,6 +413,7 @@ const Navbar = () => {
         </div>
       </header>
 
+      {/* Mobile Drawer Backdrop */}
       <div
         className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-xs transition-opacity duration-300 md:hidden ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -220,14 +422,16 @@ const Navbar = () => {
         aria-hidden="true"
       />
 
+      {/* Mobile Navigation Drawer */}
       <aside
-        className={`fixed top-0 right-0 z-50 h-full w-[82%] max-w-sm bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-50 h-full w-[85%] max-w-sm bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
         aria-modal="true"
         aria-label="Mobile Navigation"
       >
+        {/* Mobile Header */}
         <div className="flex items-center justify-between p-5 border-b border-zinc-100 dark:border-zinc-800">
           <Link
             href="/"
@@ -256,11 +460,44 @@ const Navbar = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-3">
-            Menu
+        {/* Mobile Navigation Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-5">
+          {/* User Profile Card (if logged in) */}
+          {user && (
+            <div className="mb-6 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center gap-3">
+              {userPhoto ? (
+                <img
+                  src={userPhoto}
+                  alt={user.name || "User"}
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-brand/30"
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-brand/10 text-brand font-bold text-base flex items-center justify-center ring-2 ring-brand/30">
+                  {user.name ? (
+                    user.name.charAt(0).toUpperCase()
+                  ) : (
+                    <FiUser className="w-5 h-5" />
+                  )}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                  {user.name || "User"}
+                </p>
+                {user.email && (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                    {user.email}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Links */}
+          <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+            Main Menu
           </p>
-          <nav className="flex flex-col space-y-1.5">
+          <nav className="flex flex-col space-y-1 mb-6">
             {navLinks.map((link) => {
               const active = isActive(link.href);
               return (
@@ -268,10 +505,10 @@ const Navbar = () => {
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-base font-medium transition-colors ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     active
                       ? "text-brand bg-brand/10 font-semibold"
-                      : "text-zinc-700 dark:text-zinc-300 hover:text-brand dark:hover:text-brand hover:bg-brand/5 dark:hover:bg-brand/10"
+                      : "text-zinc-700 dark:text-zinc-300 hover:text-brand hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
                   }`}
                 >
                   <span>{link.name}</span>
@@ -282,25 +519,78 @@ const Navbar = () => {
               );
             })}
           </nav>
+
+          {/* User Quick Links (if logged in) */}
+          {user && (
+            <>
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+                User Dashboard
+              </p>
+              <nav className="flex flex-col space-y-1">
+                {userMenuItems.map((item) => {
+                  const active = isActive(item.href);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                        active
+                          ? "text-brand bg-brand/10 font-semibold"
+                          : "text-zinc-700 dark:text-zinc-300 hover:text-brand hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon
+                          className={`w-4 h-4 ${
+                            active ? "text-brand" : "text-zinc-400"
+                          }`}
+                        />
+                        <span>{item.name}</span>
+                      </div>
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </>
+          )}
         </div>
 
-        <div className="p-5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/90 space-y-3">          
-          <Link
-            href="/login"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-brand dark:hover:border-brand hover:text-brand hover:bg-brand/5 dark:hover:bg-brand/10 transition-colors shadow-2xs"
-          >
-            <FiLogIn className="w-4 h-4" />
-            <span>Login</span>
-          </Link>
-          <Link
-            href="/register"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-brand hover:bg-brand-hover shadow-sm hover:shadow-md hover:shadow-brand/20 transition-all active:scale-[0.99]"
-          >
-            <FiUserPlus className="w-4 h-4" />
-            <span>Register</span>
-          </Link>
+        {/* Mobile Footer Actions */}
+        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/90">
+          {user ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border border-red-200/80 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors cursor-pointer"
+            >
+              <FiLogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <div className="space-y-2.5">
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-brand dark:hover:border-brand hover:text-brand hover:bg-brand/5 dark:hover:bg-brand/10 transition-colors shadow-2xs"
+              >
+                <FiLogIn className="w-4 h-4" />
+                <span>Login</span>
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-brand hover:bg-brand-hover shadow-sm hover:shadow-md hover:shadow-brand/20 transition-all active:scale-[0.99]"
+              >
+                <FiUserPlus className="w-4 h-4" />
+                <span>Register</span>
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
     </>

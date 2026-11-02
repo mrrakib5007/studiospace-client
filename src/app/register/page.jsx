@@ -13,6 +13,8 @@ import {
   FiEyeOff,
   FiArrowRight,
 } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -32,6 +34,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const router = useRouter();
 
   // Validate individual field or all fields
   const validateField = (name, value) => {
@@ -107,16 +110,26 @@ const RegisterPage = () => {
       // Simulate registration network request
       await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Console log registered user data
-      console.log("Registered User Data:", {
-        name: formData.name,
+      const {data, error} = await authClient.signUp.email({
         email: formData.email,
-        photoURL: formData.photoURL,
         password: formData.password,
-      });
+        name: formData.name,
+        image: formData.photoURL,
+      })
 
-      toast.success("Account registered successfully!");
-      setFormData({ name: "", email: "", photoURL: "", password: "" });
+      if (error) {        
+        toast.error("Failed to create account. Please try again.");
+        return;
+      }
+
+      if (data) {
+        setFormData({ name: "", email: "", photoURL: "", password: "" });
+        await toast.success("Account registered successfully!");
+        router.push("/login");
+      }      
+
+      
+
     } catch {
       toast.error("Failed to create account. Please try again.");
     } finally {

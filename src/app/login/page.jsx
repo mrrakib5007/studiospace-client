@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
@@ -11,8 +11,10 @@ import {
   FiEyeOff,
   FiArrowRight,
 } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const LoginPage = () => {
+const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,6 +28,9 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("callbackUrl") || "/";
 
   // Validate individual field
   const validateField = (name, value) => {
@@ -89,14 +94,22 @@ const LoginPage = () => {
       // Simulate login network request
       await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Console log login user data
-      console.log("Logged In User Data:", {
+      const {data, error} = await authClient.signIn.email({
         email: formData.email,
         password: formData.password,
-      });
+      })
 
-      toast.success("Logged in successfully!");
-      setFormData({ email: "", password: "" });
+      if (error) {
+        toast.error("Failed to login. Invalid credentials.");
+        return;
+      }
+      if (data) {
+        setFormData({ email: "", password: "" });
+        await toast.success("Logged in successfully!");
+        router.push(redirectPath);
+      }
+      
+      
     } catch {
       toast.error("Failed to login. Please check your credentials.");
     } finally {
@@ -268,6 +281,20 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const LoginPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-zinc-50/70 dark:bg-zinc-950">
+          <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 };
 
