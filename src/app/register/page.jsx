@@ -141,13 +141,13 @@ const RegisterPage = () => {
     setIsGoogleLoading(true);
 
     try {
-      // Placeholder for Google OAuth authentication
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      console.log("Google Registration Initiated");
-      toast.success("Google authentication initiated!");
-    } catch {
-      toast.error("Google authentication failed. Please try again.");
-    } finally {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      console.error("Google Registration Error:", error);
+      toast.error("Google registration failed. Please try again.");
       setIsGoogleLoading(false);
     }
   };

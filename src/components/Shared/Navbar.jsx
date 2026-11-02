@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -237,29 +236,22 @@ const Navbar = () => {
                     aria-haspopup="true"
                   >
                     {userPhoto ? (
-                      <img
+                      <Image
                         src={userPhoto}
                         alt={user.name || "User Avatar"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-brand/30"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          if (e.target.nextElementSibling) {
-                            e.target.nextElementSibling.style.display = "flex";
-                          }
-                        }}
                       />
-                    ) : null}
-                    <div
-                      className={`w-8 h-8 rounded-full bg-brand/10 text-brand font-bold text-xs items-center justify-center ring-2 ring-brand/30 ${
-                        userPhoto ? "hidden" : "flex"
-                      }`}
-                    >
-                      {user.name ? (
-                        user.name.charAt(0).toUpperCase()
-                      ) : (
-                        <FiUser className="w-4 h-4" />
-                      )}
-                    </div>
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-brand/10 text-brand font-bold text-xs flex items-center justify-center ring-2 ring-brand/30">
+                        {user.name ? (
+                          user.name.charAt(0).toUpperCase()
+                        ) : (
+                          <FiUser className="w-4 h-4" />
+                        )}
+                      </div>
+                    )}
 
                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 max-w-25 truncate">
                       {user.name?.split(" ")[0] || "Account"}
@@ -278,9 +270,11 @@ const Navbar = () => {
                       <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
                         <div className="flex items-center gap-3">
                           {userPhoto ? (
-                            <img
+                            <Image
                               src={userPhoto}
                               alt={user.name || "User"}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded-full object-cover ring-2 ring-brand/20"
                             />
                           ) : (
@@ -466,9 +460,11 @@ const Navbar = () => {
           {user && (
             <div className="mb-6 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center gap-3">
               {userPhoto ? (
-                <img
+                <Image
                   src={userPhoto}
                   alt={user.name || "User"}
+                  width={44}
+                  height={44}
                   className="w-11 h-11 rounded-full object-cover ring-2 ring-brand/30"
                 />
               ) : (

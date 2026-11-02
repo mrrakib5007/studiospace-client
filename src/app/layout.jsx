@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Bricolage_Grotesque, Manrope } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
@@ -34,7 +35,9 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
+          <Suspense fallback={<div className="h-16 w-full" />}>
+            <Navbar />
+          </Suspense>
           <main className="flex-1">{children}</main>
           <Toaster />
           <Footer />

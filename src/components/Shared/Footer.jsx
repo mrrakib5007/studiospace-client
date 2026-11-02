@@ -22,11 +22,11 @@ const quickLinks = [
 ];
 
 const studioCategories = [
-  { name: "Photo Studios", href: "/studios?category=Photo%20Studios" },
-  { name: "Sound Stages", href: "/studios?category=Sound%20Stages" },
-  { name: "Podcast Rooms", href: "/studios?category=Podcast%20Rooms" },
-  { name: "Music Suites", href: "/studios?category=Music%20Suites" },
-  { name: "Art Workshops", href: "/studios?category=Art%20Workshops" },
+  { name: "Photo Studio", href: "/studios?category=Photo%20Studio" },
+  { name: "Film Stage", href: "/studios?category=Film%20Stage" },
+  { name: "Podcast Lounge", href: "/studios?category=Podcast%20Lounge" },
+  { name: "Music Suite", href: "/studios?category=Music%20Suite" },
+  { name: "Art Workshop", href: "/studios?category=Art%20Workshop" },
 ];
 
 const socialLinks = [

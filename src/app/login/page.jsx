@@ -100,7 +100,7 @@ const LoginForm = () => {
       })
 
       if (error) {
-        toast.error("Failed to login. Invalid credentials.");
+        toast.error("Failed to login. Invalid Email or Password.");
         return;
       }
       if (data) {
@@ -121,13 +121,13 @@ const LoginForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      // Placeholder for Google OAuth authentication
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      console.log("Google Login Initiated");
-      toast.success("Google authentication initiated!");
-    } catch {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: redirectPath || "/",
+      });
+    } catch (error) {
+      console.error("Google Login Error:", error);
       toast.error("Google authentication failed. Please try again.");
-    } finally {
       setIsGoogleLoading(false);
     }
   };
