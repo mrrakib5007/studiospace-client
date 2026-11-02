@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   FaXTwitter,
@@ -64,13 +63,7 @@ const socialLinks = [
 ];
 
 const Footer = () => {
-  const pathname = usePathname();
   const [email, setEmail] = useState("");
-
-  // Hide general Footer on Dashboard pages
-  if (pathname?.startsWith("/dashboard")) {
-    return null;
-  }
 
   const handleSubscribe = (e) => {
     e.preventDefault();

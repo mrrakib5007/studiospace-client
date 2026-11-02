@@ -7,8 +7,11 @@ import toast from "react-hot-toast";
 import { useSession, authClient } from "@/lib/auth-client";
 import {
   FiUser,
-  FiMail,
   FiCalendar,
+  FiCompass,
+  FiTrendingUp,
+  FiDollarSign,
+  FiCamera,
   FiEdit2,
   FiLink,
   FiUploadCloud,
@@ -16,7 +19,7 @@ import {
   FiX,
 } from "react-icons/fi";
 
-// Verify if a string is a valid web URL
+
 const isValidURL = (url) => {
   if (!url || typeof url !== "string") return false;
   const trimmed = url.trim();
@@ -27,6 +30,42 @@ const isValidURL = (url) => {
     return false;
   }
 };
+
+// 4 Static Statistics Cards
+const statCards = [
+  {
+    id: "total-bookings",
+    label: "Total Bookings",
+    value: "0",
+    icon: FiCalendar,
+    bgColor: "bg-sky-50 dark:bg-sky-950/40",
+    iconColor: "text-sky-500",
+  },
+  {
+    id: "my-studios",
+    label: "My Studios",
+    value: "0",
+    icon: FiCompass,
+    bgColor: "bg-emerald-50 dark:bg-emerald-950/40",
+    iconColor: "text-emerald-500",
+  },
+  {
+    id: "upcoming-shoots",
+    label: "Upcoming Shoots",
+    value: "0",
+    icon: FiTrendingUp,
+    bgColor: "bg-amber-50 dark:bg-amber-950/40",
+    iconColor: "text-amber-500",
+  },
+  {
+    id: "total-spent",
+    label: "Total Spent",
+    value: "15750",
+    icon: FiDollarSign,
+    bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
+    iconColor: "text-fuchsia-500",
+  },
+];
 
 function ProfileCard({ user }) {
   const router = useRouter();
@@ -173,69 +212,116 @@ function ProfileCard({ user }) {
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
   const activeAvatar = isEditing ? (image.trim() || currentPhoto) : currentPhoto;
 
-  // Format CreatedAt date
-  const formattedCreatedAt = user?.createdAt
+  // Format CreatedAt date as "MMM YYYY"
+  const formattedMemberSince = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-US", {
+        month: "short",
         year: "numeric",
-        month: "long",
-        day: "numeric",
       })
-    : "Member";
+    : "Mar 2024";
 
   return (
-    <div className="max-w-xl mx-auto py-6 sm:py-10">
-      {/* ================= MAIN PROFILE CARD ================= */}
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-10 transition-colors">
-        <div className="flex flex-col items-center text-center space-y-6">
-          {/* Profile Photo */}
-          <div className="relative">
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full ring-4 ring-brand/30 overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-4xl font-extrabold text-brand shadow-md">
-              {currentPhoto ? (
-                <Image
-                  unoptimized
-                  src={currentPhoto}
-                  alt={user?.name || "Profile Photo"}
-                  width={128}
-                  height={128}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{initial}</span>
-              )}
-            </div>
-          </div>
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* ================= LEFT COLUMN: PROFILE CARD ================= */}
+        <div className="lg:col-span-4 xl:col-span-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 shadow-xs p-6 sm:p-7 transition-colors">
+            <div className="flex flex-col items-center text-center">
+              {/* Profile Photo with Camera Badge */}
+              <div className="relative">
+                <div className="w-28 h-28 rounded-full ring-4 ring-zinc-100 dark:ring-zinc-800 overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-3xl font-extrabold text-brand shadow-md">
+                  {currentPhoto ? (
+                    <Image
+                      unoptimized
+                      src={currentPhoto}
+                      alt={user?.name || "Profile Photo"}
+                      width={112}
+                      height={112}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{initial}</span>
+                  )}
+                </div>
 
-          {/* Profile Info: Name, Email Address, CreatedAt */}
-          <div className="space-y-3 w-full">
-            <h2 className="font-bricolage text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">
-              {user?.name || "Anonymous User"}
-            </h2>
-
-            <div className="flex flex-col items-center justify-center gap-2 pt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {/* Email Address */}
-              <div className="flex items-center gap-2">
-                <FiMail className="w-4 h-4 text-brand shrink-0" />
-                <span className="font-medium">{user?.email}</span>
+                {/* Small camera edit badge on avatar */}
+                <button
+                  type="button"
+                  onClick={handleOpenEdit}
+                  title="Change photo"
+                  aria-label="Change photo"
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-brand hover:bg-brand-hover text-white flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 transition-transform active:scale-90 cursor-pointer"
+                >
+                  <FiCamera className="w-4 h-4" />
+                </button>
               </div>
 
-              {/* CreatedAt */}
-              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                <FiCalendar className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                <span>Joined: {formattedCreatedAt}</span>
+              {/* User Name */}
+              <h2 className="font-bricolage text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mt-4 tracking-tight">
+                {user?.name || "Anonymous User"}
+              </h2>
+
+              {/* Info Details List */}
+              <div className="w-full pt-6 mt-6 border-t border-zinc-100 dark:border-zinc-800 space-y-3.5 text-sm">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                  <span className="font-normal">Member since</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {formattedMemberSince}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                  <span className="font-normal">Email</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate max-w-44 text-right">
+                    {user?.email || "N/A"}
+                  </span>
+                </div>
               </div>
+
+              {/* Edit Profile Button (Brand Color) */}
+              <button
+                type="button"
+                onClick={handleOpenEdit}
+                className="w-full mt-6 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-brand hover:bg-brand-hover active:scale-[0.98] transition-all shadow-md shadow-brand/20 cursor-pointer"
+              >
+                <FiEdit2 className="w-4 h-4" />
+                <span>Edit Profile</span>
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Edit Profile Button */}
-          <div className="pt-4 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={handleOpenEdit}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white bg-brand hover:bg-brand-hover active:scale-[0.98] transition-all shadow-md shadow-brand/20 cursor-pointer"
-            >
-              <FiEdit2 className="w-4 h-4" />
-              <span>Edit Profile</span>
-            </button>
+        {/* ================= RIGHT COLUMN: 4 STATS CARDS ================= */}
+        <div className="lg:col-span-8 xl:col-span-8 space-y-4">
+          <h3 className="font-bricolage text-lg font-bold text-zinc-900 dark:text-white">
+            Studio Statistics
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {statCards.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.id}
+                  className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-5 sm:p-6 shadow-xs flex items-center justify-between transition-colors hover:border-brand/40"
+                >
+                  <div>
+                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                      {stat.label}
+                    </p>
+                    <p className="font-bricolage text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1.5 tracking-tight">
+                      {stat.value}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${stat.bgColor} ${stat.iconColor} shrink-0`}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -410,26 +496,61 @@ function ProfileCard({ user }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-export default function DashboardProfilePage() {
+export default function ProfilePage() {
+  const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
+  useEffect(() => {
+    if (!isPending && !user) {
+      router.push("/login?callbackUrl=/profile");
+    }
+  }, [isPending, user, router]);
+
   if (isPending || !user) {
     return (
-      <div className="max-w-xl mx-auto py-8">
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 flex flex-col items-center space-y-4 animate-pulse">
-          <div className="w-28 h-28 rounded-full bg-zinc-200 dark:bg-zinc-800" />
-          <div className="w-44 h-6 bg-zinc-200 dark:bg-zinc-800 rounded-md" />
-          <div className="w-60 h-4 bg-zinc-200 dark:bg-zinc-800 rounded-md" />
-          <div className="w-32 h-10 bg-zinc-200 dark:bg-zinc-800 rounded-xl mt-4" />
+      <div className="min-h-[70vh] flex items-center justify-center py-16 px-4 bg-zinc-50/60 dark:bg-zinc-950 transition-colors">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-pulse">
+            <div className="lg:col-span-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 flex flex-col items-center space-y-4">
+              <div className="w-28 h-28 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+              <div className="w-36 h-6 bg-zinc-200 dark:bg-zinc-800 rounded-md" />
+              <div className="w-full h-10 bg-zinc-200 dark:bg-zinc-800 rounded-xl mt-4" />
+            </div>
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 h-28"
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  return <ProfileCard key={user.id || "creator"} user={user} />;
+  return (
+    <div className="min-h-[80vh] py-10 sm:py-14 px-4 sm:px-6 lg:px-8 bg-zinc-50/60 dark:bg-zinc-950 transition-colors">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Top Header */}
+        <div>
+          <h1 className="font-bricolage text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+            My Profile
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5">
+            Manage your account settings and studio preferences
+          </p>
+        </div>
+
+        {/* Profile Card & Stats Grid */}
+        <ProfileCard key={user.id || user.email} user={user} />
+      </div>
+    </div>
+  );
 }

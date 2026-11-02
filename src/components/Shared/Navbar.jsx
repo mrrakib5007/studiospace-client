@@ -16,7 +16,6 @@ import {
   FiMoon,
   FiUser,
   FiChevronDown,
-  FiGrid,
   FiPlusCircle,
   FiList,
   FiCalendar,
@@ -31,10 +30,10 @@ const navLinks = [
 ];
 
 const userMenuItems = [
-  { name: "Dashboard", href: "/dashboard", icon: FiGrid },
-  { name: "Add New Studio", href: "/dashboard/add-studio", icon: FiPlusCircle },
-  { name: "My Studio Listings", href: "/dashboard/my-studios", icon: FiList },
-  { name: "My Bookings", href: "/dashboard/my-bookings", icon: FiCalendar },
+  { name: "Dashboard", href: "/profile", icon: FiUser },
+  { name: "Add New Studio", href: "/add-studio", icon: FiPlusCircle },
+  { name: "My Studio Listings", href: "/my-studios", icon: FiList },
+  { name: "My Bookings", href: "/my-bookings", icon: FiCalendar },
 ];
 
 const Navbar = () => {
@@ -132,17 +131,12 @@ const Navbar = () => {
     setIsOpen(false);
     try {
       await signOut();
-      toast.success("Logged out successfully");      
+      toast.success("Logged out successfully");
     } catch (err) {
       console.error("Logout error:", err);
       toast.error("Failed to log out");
     }
   };
-
-  // Hide general Navbar in Dashboard to preserve dedicated full-height dashboard layout
-  if (pathname?.startsWith("/dashboard")) {
-    return null;
-  }
 
   return (
     <>
@@ -530,7 +524,7 @@ const Navbar = () => {
           {user && (
             <>
               <p className="px-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
-                User Dashboard
+                Account
               </p>
               <nav className="flex flex-col space-y-1">
                 {userMenuItems.map((item) => {

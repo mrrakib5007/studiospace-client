@@ -495,10 +495,7 @@ const StudioDetails = () => {
                 >
                   Book Workspace Now
                 </button>
-
-                <p className="text-[11px] text-center text-zinc-400 mt-3 font-light">
-                  You won&apos;t be billed until the host accepts your reservation.
-                </p>
+                
               </div>
             </div>
           </div>

@@ -68,25 +68,16 @@ const CategorySection = () => {
   return (
     <section className="w-full py-16 sm:py-20 lg:py-24 bg-zinc-50/70 dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 lg:mb-14">
-          <div className="max-w-2xl space-y-3">
-            <h2 className="font-bricolage text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">
-              Browse by Studio Categories
-            </h2>
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center space-y-3 mb-12 lg:mb-14">
+          <h2 className="font-bricolage text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">
+            Browse by Studio Categories
+          </h2>
 
-            <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-light">
-              Explore specialized environments pre-equipped with high-end lighting,
-              sound treatment, and creative infrastructure tailored to your workflow.
-            </p>
-          </div>
-
-          <Link
-            href="/studios"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand hover:text-brand-hover transition-colors group self-start md:self-end shrink-0"
-          >
-            <span>Explore All Studios</span>
-            <FiArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </Link>
+          <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-light">
+            Explore specialized environments pre-equipped with high-end lighting,
+            sound treatment, and creative infrastructure tailored to your workflow.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6">

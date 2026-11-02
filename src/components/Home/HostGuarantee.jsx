@@ -7,13 +7,11 @@ import {
   FiHeadphones,
   FiCheckCircle,
   FiArrowRight,
-  FiAward,
 } from "react-icons/fi";
 
 const guarantees = [
   {
     id: "liability",
-    tag: "Up to $1M Coverage",
     title: "Liability Protection",
     description:
       "Comprehensive property and personal liability protection covering both hosts and creators against accidental damage during booked production sessions.",
@@ -26,7 +24,6 @@ const guarantees = [
   },
   {
     id: "verified-profiles",
-    tag: "100% ID Verified",
     title: "Verified Profiles",
     description:
       "Every studio owner and creator undergoes thorough identity verification, secure payment screening, and transparent peer reviews.",
@@ -39,7 +36,6 @@ const guarantees = [
   },
   {
     id: "equipment-safety",
-    tag: "Gear Protection",
     title: "Equipment Safety",
     description:
       "Digital equipment check-in logs ensure cameras, strobe kits, and cinema rigs are inspected and documented before and after every booking.",
@@ -52,7 +48,6 @@ const guarantees = [
   },
   {
     id: "support-24-7",
-    tag: "Always Available",
     title: "24/7 Support",
     description:
       "Real industry professionals available 24 hours a day, 7 days a week. From access troubleshooting to booking extensions, we've got your back.",
@@ -98,15 +93,11 @@ const HostGuarantee = () => {
                 className="group relative flex flex-col justify-between h-full p-6 sm:p-7 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200/90 dark:border-zinc-800/90 shadow-2xs hover:shadow-xl hover:shadow-brand/5 hover:border-brand/40 dark:hover:border-brand/40 transition-all duration-300 hover:-translate-y-1.5"
               >
                 <div>
-                  {/* Top Bar: Icon & Pill Tag */}
-                  <div className="flex items-center justify-between mb-5">
+                  {/* Icon */}
+                  <div className="mb-5">
                     <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-brand/10 text-brand border border-brand/20 group-hover:bg-brand group-hover:text-white group-hover:border-brand transition-all duration-300 shadow-xs">
                       <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
                     </div>
-
-                    <span className="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-md bg-brand/10 dark:bg-brand/15 text-brand">
-                      {item.tag}
-                    </span>
                   </div>
 
                   {/* Title & Description */}

@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FiSearch,
   FiX,
   FiRefreshCw,
   FiFrown,
+  FiChevronDown,
+  FiLoader,
 } from "react-icons/fi";
 import StudioCard from "@/components/Studios/StudioCard";
 
@@ -61,6 +63,12 @@ const ExploreStudiosContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalStudios, setTotalStudios] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   // Debounce search query
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -69,21 +77,32 @@ const ExploreStudiosContent = () => {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
+  // Query params builder
+  const buildQueryParams = useCallback(
+    (pageNum = 1) => {
+      const params = new URLSearchParams();
+      if (selectedCategory && selectedCategory !== "All") {
+        params.append("category", selectedCategory);
+      }
+      if (debouncedSearch.trim()) {
+        params.append("search", debouncedSearch.trim());
+      }
+      if (sortBy) {
+        params.append("sort", sortBy);
+      }
+      params.append("page", pageNum);
+      params.append("limit", 12);
+      return params.toString();
+    },
+    [selectedCategory, debouncedSearch, sortBy]
+  );
+
   // Fetch studios from API when filters change
   useEffect(() => {
     let ignore = false;
-    const params = new URLSearchParams();
-    if (selectedCategory && selectedCategory !== "All") {
-      params.append("category", selectedCategory);
-    }
-    if (debouncedSearch.trim()) {
-      params.append("search", debouncedSearch.trim());
-    }
-    if (sortBy) {
-      params.append("sort", sortBy);
-    }
+    const queryString = buildQueryParams(1);
 
-    fetch(`${API_URL}/api/studios?${params.toString()}`)
+    fetch(`${API_URL}/api/studios?${queryString}`)
       .then((res) => {
         if (!res.ok) throw new Error(`Status ${res.status}`);
         return res.json();
@@ -92,6 +111,8 @@ const ExploreStudiosContent = () => {
         if (!ignore) {
           if (data.success) {
             setStudios(data.studios || []);
+            setTotalStudios(data.total ?? (data.studios?.length || 0));
+            setHasMore(Boolean(data.hasMore));
             setError(null);
           } else {
             setError(data.message || "Failed to load studios");
@@ -112,11 +133,36 @@ const ExploreStudiosContent = () => {
     return () => {
       ignore = true;
     };
-  }, [selectedCategory, debouncedSearch, sortBy]);
+  }, [buildQueryParams]);
+
+  // Load more studios when user clicks "Show More"
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+    const queryString = buildQueryParams(nextPage);
+
+    try {
+      const res = await fetch(`${API_URL}/api/studios?${queryString}`);
+      if (!res.ok) throw new Error(`Status ${res.status}`);
+      const data = await res.json();
+      if (data.success) {
+        setStudios((prev) => [...prev, ...(data.studios || [])]);
+        setPage(nextPage);
+        setHasMore(Boolean(data.hasMore));
+        setTotalStudios(data.total ?? 0);
+      }
+    } catch (err) {
+      console.error("Error loading more studios:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const handleCategoryChange = (e) => {
     const category = e.target.value;
     setIsLoading(true);
+    setPage(1);
     if (category === "All") {
       router.replace("/studios");
     } else {
@@ -126,16 +172,19 @@ const ExploreStudiosContent = () => {
 
   const handleSortChange = (e) => {
     setIsLoading(true);
+    setPage(1);
     setSortBy(e.target.value);
   };
 
   const handleSearchChange = (e) => {
     setIsLoading(true);
+    setPage(1);
     setSearchQuery(e.target.value);
   };
 
   const handleResetFilters = () => {
     setIsLoading(true);
+    setPage(1);
     setSearchQuery("");
     setDebouncedSearch("");
     setSortBy("newest");
@@ -145,21 +194,15 @@ const ExploreStudiosContent = () => {
   const retryFetch = () => {
     setIsLoading(true);
     setError(null);
-    const params = new URLSearchParams();
-    if (selectedCategory && selectedCategory !== "All") {
-      params.append("category", selectedCategory);
-    }
-    if (debouncedSearch.trim()) {
-      params.append("search", debouncedSearch.trim());
-    }
-    if (sortBy) {
-      params.append("sort", sortBy);
-    }
-    fetch(`${API_URL}/api/studios?${params.toString()}`)
+    setPage(1);
+    const queryString = buildQueryParams(1);
+    fetch(`${API_URL}/api/studios?${queryString}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setStudios(data.studios || []);
+          setTotalStudios(data.total ?? (data.studios?.length || 0));
+          setHasMore(Boolean(data.hasMore));
           setError(null);
         } else {
           setError(data.message || "Failed to load studios");
@@ -260,7 +303,11 @@ const ExploreStudiosContent = () => {
                 <span className="font-bold text-zinc-900 dark:text-white">
                   {studios.length}
                 </span>{" "}
-                available creative {studios.length === 1 ? "space" : "spaces"}
+                of{" "}
+                <span className="font-bold text-zinc-900 dark:text-white">
+                  {totalStudios}
+                </span>{" "}
+                available creative {totalStudios === 1 ? "space" : "spaces"}
               </>
             )}
           </p>
@@ -327,11 +374,40 @@ const ExploreStudiosContent = () => {
             </button>
           </div>
         ) : (
-          /* Studios Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {studios.map((studio) => (
-              <StudioCard key={studio._id} studio={studio} />
-            ))}
+          /* Studios Grid & Show More Pagination */
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {studios.map((studio) => (
+                <StudioCard key={studio._id} studio={studio} />
+              ))}
+            </div>
+
+            {/* Show More Button */}
+            {hasMore && (
+              <div className="mt-12 text-center flex flex-col items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={isLoadingMore}
+                  className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-2xl text-sm font-semibold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-lg hover:shadow-brand/20 transition-all duration-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <FiLoader className="w-4 h-4 animate-spin" />
+                      <span>Loading More Studios...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Show More Studios</span>
+                      <FiChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                  Showing {studios.length} of {totalStudios} available creative spaces
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
