@@ -30,9 +30,9 @@ const navLinks = [
 ];
 
 const userMenuItems = [
-  { name: "Dashboard", href: "/profile", icon: FiUser },
+  { name: "My Profile", href: "/profile", icon: FiUser },
   { name: "Add New Studio", href: "/add-studio", icon: FiPlusCircle },
-  { name: "My Studio Listings", href: "/my-studios", icon: FiList },
+  { name: "My Studio Listings", href: "/my-listings", icon: FiList },
   { name: "My Bookings", href: "/my-bookings", icon: FiCalendar },
 ];
 

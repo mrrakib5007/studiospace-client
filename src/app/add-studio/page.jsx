@@ -182,7 +182,7 @@ export default function AddStudioPage() {
       toast.success("Studio workspace published successfully!", {
         id: toastId,
       });
-      router.push("/my-studios");
+      router.push("/my-listings");
     } catch (err) {
       console.error("Studio creation error:", err);
       toast.error(err.message || "Failed to create studio listing.", {
@@ -468,7 +468,7 @@ export default function AddStudioPage() {
           {/* Submit Button */}
           <div className="pt-4 flex items-center justify-end gap-3 border-t border-zinc-100 dark:border-zinc-800">
             <Link
-              href="/my-studios"
+              href="/my-listings"
               className="px-5 py-2.5 rounded-xl text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Cancel
