@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, notFound } from "next/navigation";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
 import {
@@ -101,24 +101,30 @@ const StudioDetails = () => {
     let ignore = false;
     fetch(`${API_URL}/api/studios/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error(`Status ${res.status}`);
+        if (!res.ok) {
+          if (res.status === 404 || res.status === 400) {
+            return { notFound: true };
+          }
+          throw new Error(`Server returned status ${res.status}`);
+        }
         return res.json();
       })
       .then((data) => {
         if (!ignore) {
-          if (data.success && data.studio) {
+          if (data?.notFound) {
+            setError("Studio workspace not found");
+          } else if (data?.success && data?.studio) {
             setStudio(data.studio);
             setError(null);
           } else {
-            setError(data.message || "Studio workspace not found");
+            setError(data?.message || "Studio workspace not found");
           }
           setIsLoading(false);
         }
       })
       .catch((err) => {
         if (!ignore) {
-          console.error("Error fetching studio details:", err);
-          setError("Failed to load studio details. Please check the ID or backend server.");
+          setError("Failed to load studio details.");
           setIsLoading(false);
         }
       });
@@ -193,30 +199,9 @@ const StudioDetails = () => {
     return <StudioDetailsSkeleton />;
   }
 
-  // Error / Not found state
+  // Not found state - trigger Next.js notFound() boundary to render not-found.jsx
   if (error || !studio) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center py-16 px-4">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 sm:p-10 text-center shadow-lg">
-          <div className="w-14 h-14 mx-auto rounded-full bg-red-50 dark:bg-red-950/40 text-red-500 flex items-center justify-center mb-4">
-            <FiAlertCircle className="w-7 h-7" />
-          </div>
-          <h2 className="font-bricolage text-2xl font-bold text-zinc-900 dark:text-white mb-2">
-            Studio Not Found
-          </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
-            {error || "The creative space you are looking for does not exist or may have been unlisted."}
-          </p>
-          <Link
-            href="/studios"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand hover:bg-brand-hover transition-all active:scale-95 shadow-sm"
-          >
-            <FiArrowLeft className="w-4 h-4" />
-            <span>Return to Explore Studios</span>
-          </Link>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   return (

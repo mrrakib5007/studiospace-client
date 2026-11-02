@@ -46,14 +46,14 @@ const guarantees = [
     points: [
       "Digital gear inspection logs",
       "Equipment replacement guarantee",
-      "Dedicated dispute mediation support",
+      "Dispute mediation support",
     ],
     icon: FiLock,
   },
   {
     id: "support-24-7",
     tag: "Always Available",
-    title: "24/7 Dedicated Support",
+    title: "24/7 Support",
     description:
       "Real industry professionals available 24 hours a day, 7 days a week. From access troubleshooting to booking extensions, we've got your back.",
     points: [
@@ -155,8 +155,7 @@ const HostGuarantee = () => {
             <Link
               href="/studios"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 active:scale-95 group cursor-pointer"
-            >
-              <FiAward className="w-4 h-4" />
+            >              
               <span>Explore Protected Spaces</span>
               <FiArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>

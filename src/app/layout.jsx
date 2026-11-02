@@ -40,7 +40,9 @@ export default function RootLayout({ children }) {
           </Suspense>
           <main className="flex-1">{children}</main>
           <Toaster />
-          <Footer />
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

@@ -26,7 +26,7 @@ import {
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Explore Studios", href: "/studios" },
-  { name: "How It Works", href: "/how-it-works" },
+  { name: "How It Works", href: "/#how-it-works" },
   { name: "About Us", href: "/about" },
 ];
 
@@ -55,7 +55,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(t);
+  return () => clearTimeout(t);
   }, []);
 
   const toggleTheme = () => {
@@ -69,7 +69,7 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Lock body scroll when mobile menu is open
@@ -80,7 +80,7 @@ const Navbar = () => {
       document.body.style.overflow = "";
     }
 
-    return () => {
+  return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
@@ -95,7 +95,7 @@ const Navbar = () => {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isUserMenuOpen]);
 
   // Handle click outside to close user dropdown
@@ -107,12 +107,19 @@ const Navbar = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+  return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   const isActive = (href) => {
     if (href === "/") {
       return pathname === "/";
+    }
+    if (href.startsWith("/#")) {
+      return false;
     }
     if (pathname === href) {
       return true;
@@ -131,6 +138,11 @@ const Navbar = () => {
       toast.error("Failed to log out");
     }
   };
+
+  // Hide general Navbar in Dashboard to preserve dedicated full-height dashboard layout
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <>
@@ -167,7 +179,7 @@ const Navbar = () => {
             <nav className="hidden md:flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
-                return (
+              return (
                   <Link
                     key={link.name}
                     href={link.href}
@@ -221,12 +233,10 @@ const Navbar = () => {
                 // Skeleton loader while session is being resolved
                 <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
               ) : user ? (
-                // User Avatar and Dropdown on Hover/Click
+                // User Avatar and Dropdown on Click
                 <div
                   ref={userMenuRef}
                   className="relative"
-                  onMouseEnter={() => setIsUserMenuOpen(true)}
-                  onMouseLeave={() => setIsUserMenuOpen(false)}
                 >
                   <button
                     type="button"
@@ -304,7 +314,7 @@ const Navbar = () => {
                         {userMenuItems.map((item) => {
                           const active = isActive(item.href);
                           const Icon = item.icon;
-                          return (
+                        return (
                             <Link
                               key={item.name}
                               href={item.href}
@@ -496,7 +506,7 @@ const Navbar = () => {
           <nav className="flex flex-col space-y-1 mb-6">
             {navLinks.map((link) => {
               const active = isActive(link.href);
-              return (
+            return (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -526,7 +536,7 @@ const Navbar = () => {
                 {userMenuItems.map((item) => {
                   const active = isActive(item.href);
                   const Icon = item.icon;
-                  return (
+                return (
                     <Link
                       key={item.name}
                       href={item.href}

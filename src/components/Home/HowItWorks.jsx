@@ -46,7 +46,10 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="w-full py-16 sm:py-20 lg:py-24 bg-white dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+    <section
+      id="how-it-works"
+      className="w-full py-16 sm:py-20 lg:py-24 bg-white dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors scroll-mt-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-14 sm:mb-16">
