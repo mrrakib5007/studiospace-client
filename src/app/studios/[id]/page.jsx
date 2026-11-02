@@ -93,6 +93,7 @@ const StudioDetails = () => {
   });
   const [startTime, setStartTime] = useState("10:00");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
 
   // Fetch studio details by ID
   useEffect(() => {
@@ -158,33 +159,59 @@ const StudioDetails = () => {
   };
 
   // Confirm booking reservation
-  const handleConfirmBooking = (e) => {
+  const handleConfirmBooking = async (e) => {
     e.preventDefault();
     if (!user) {
       toast.error("You must be logged in to book.");
       return;
     }
 
-    const bookingData = {
-      studioId: studio._id,
-      studioTitle: studio.title,
-      studioImage: studio.image,
-      hourlyRate: studio.hourlyRate,
-      userEmail: user?.email,
-      userName: user?.name,
-      bookingDate,
-      startTime,
-      endTime: calculateEndTime(startTime, parsedHours),
-      totalHours: parsedHours,
-      totalPrice,
-    };
+    setIsBookingSubmitting(true);
+    const toastId = toast.loading("Reserving studio slot...");
 
-    console.log("=== Studio Booking Request ===");
-    console.log("Logged In User Email:", user?.email);
-    console.log("Booking Data:", bookingData);
+    try {
+      const bookingData = {
+        studioId: studio._id,
+        studioTitle: studio.title,
+        studioImage: studio.image,
+        studioLocation: studio.location,
+        category: studio.category,
+        hourlyRate: studio.hourlyRate,
+        userEmail: user?.email,
+        userName: user?.name,
+        bookingDate,
+        startTime,
+        endTime: calculateEndTime(startTime, parsedHours),
+        totalHours: parsedHours,
+        totalPrice,
+      };
 
-    toast.success("Studio booking request received successfully!");
-    setIsModalOpen(false);
+      const res = await fetch(`${API_URL}/api/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to reserve studio slot");
+      }
+
+      toast.success("Studio reservation requested! Status: Pending", {
+        id: toastId,
+      });
+      setIsModalOpen(false);
+      router.push("/my-bookings");
+    } catch (err) {
+      console.error("Booking error:", err);
+      toast.error(err.message || "Could not complete reservation.", {
+        id: toastId,
+      });
+    } finally {
+      setIsBookingSubmitting(false);
+    }
   };
 
   // Helper to calculate end time string
@@ -568,9 +595,10 @@ const StudioDetails = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-brand/20 transition-all active:scale-95 cursor-pointer"
+                  disabled={isBookingSubmitting}
+                  className="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-white bg-brand hover:bg-brand-hover shadow-md hover:shadow-brand/20 transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
                 >
-                  Confirm & Send
+                  {isBookingSubmitting ? "Reserving..." : "Confirm & Send"}
                 </button>
               </div>
             </form>
