@@ -31,42 +31,6 @@ const isValidURL = (url) => {
   }
 };
 
-// 4 Static Statistics Cards
-const statCards = [
-  {
-    id: "total-bookings",
-    label: "Total Bookings",
-    value: "0",
-    icon: FiCalendar,
-    bgColor: "bg-sky-50 dark:bg-sky-950/40",
-    iconColor: "text-sky-500",
-  },
-  {
-    id: "my-studios",
-    label: "My Studios",
-    value: "0",
-    icon: FiCompass,
-    bgColor: "bg-emerald-50 dark:bg-emerald-950/40",
-    iconColor: "text-emerald-500",
-  },
-  {
-    id: "upcoming-shoots",
-    label: "Upcoming Shoots",
-    value: "0",
-    icon: FiTrendingUp,
-    bgColor: "bg-amber-50 dark:bg-amber-950/40",
-    iconColor: "text-amber-500",
-  },
-  {
-    id: "total-spent",
-    label: "Total Spent",
-    value: "15750",
-    icon: FiDollarSign,
-    bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
-    iconColor: "text-fuchsia-500",
-  },
-];
-
 function ProfileCard({ user }) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -75,6 +39,81 @@ function ProfileCard({ user }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewError, setPreviewError] = useState(false);
+
+  // Dynamic Studio & Booking Statistics
+  const [stats, setStats] = useState({
+    totalBookings: 0,
+    myStudios: 0,
+    upcomingShoots: 0,
+    totalSpent: 0,
+  });
+  const [isStatsLoading, setIsStatsLoading] = useState(true);
+
+  // Fetch dynamic studio statistics for the logged-in user
+  useEffect(() => {
+    let ignore = false;
+    if (!user?.email) return;
+
+    fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/user-stats?email=${encodeURIComponent(
+        user.email
+      )}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (!ignore) {
+          if (data.success && data.stats) {
+            setStats(data.stats);
+          }
+          setIsStatsLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          console.error("Error fetching studio statistics:", err);
+          setIsStatsLoading(false);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [user?.email]);
+
+  const dynamicStatCards = [
+    {
+      id: "total-bookings",
+      label: "Total Bookings",
+      value: stats.totalBookings.toLocaleString(),
+      icon: FiCalendar,
+      bgColor: "bg-sky-50 dark:bg-sky-950/40",
+      iconColor: "text-sky-500",
+    },
+    {
+      id: "my-studios",
+      label: "My Studios",
+      value: stats.myStudios.toLocaleString(),
+      icon: FiCompass,
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/40",
+      iconColor: "text-emerald-500",
+    },
+    {
+      id: "upcoming-shoots",
+      label: "Upcoming Shoots",
+      value: stats.upcomingShoots.toLocaleString(),
+      icon: FiTrendingUp,
+      bgColor: "bg-amber-50 dark:bg-amber-950/40",
+      iconColor: "text-amber-500",
+    },
+    {
+      id: "total-spent",
+      label: "Total Spent",
+      value: `$${Number(stats.totalSpent || 0).toLocaleString()}`,
+      icon: FiDollarSign,
+      bgColor: "bg-fuchsia-50 dark:bg-fuchsia-950/40",
+      iconColor: "text-fuchsia-500",
+    },
+  ];
 
   // Close modal on Escape key
   useEffect(() => {
@@ -298,7 +337,7 @@ function ProfileCard({ user }) {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {statCards.map((stat) => {
+            {dynamicStatCards.map((stat) => {
               const Icon = stat.icon;
               return (
                 <div
@@ -309,9 +348,13 @@ function ProfileCard({ user }) {
                     <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                       {stat.label}
                     </p>
-                    <p className="font-bricolage text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1.5 tracking-tight">
-                      {stat.value}
-                    </p>
+                    {isStatsLoading ? (
+                      <div className="h-8 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-md animate-pulse mt-2" />
+                    ) : (
+                      <p className="font-bricolage text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-1.5 tracking-tight">
+                        {stat.value}
+                      </p>
+                    )}
                   </div>
 
                   <div
