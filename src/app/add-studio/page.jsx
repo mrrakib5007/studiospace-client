@@ -57,12 +57,6 @@ export default function AddStudioPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!isPending && !user) {
-      router.push("/login?callbackUrl=/add-studio");
-    }
-  }, [isPending, user, router]);
-
   const toggleAmenity = (amenity) => {
     setFormData((prev) => ({
       ...prev,
@@ -170,6 +164,7 @@ export default function AddStudioPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(payload),
         }
       );

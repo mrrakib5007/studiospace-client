@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# StudioSpace - Client
 
-## Getting Started
+StudioSpace is a creative studio booking platform that allows users to discover, list, and book professional spaces for photography, filmmaking, podcasting, and other creative projects. It features secure authentication, studio management, real-time booking conflict prevention, and booking management.
 
-First, run the development server:
+---
 
+## Live Website URL
+- **Live Client Application:** [https://studiospace-pro.vercel.app](https://studiospace-pro.vercel.app)
+- **Live Server API:** [https://api-studiospace.vercel.app](https://api-studiospace.vercel.app)
+
+---
+
+## Key Features
+
+- **User Authentication** - Email/Password and Google OAuth login via Better-Auth.
+- **Route Protection** - Proxy safeguarding private routes and user dashboards.
+- **Studio Discovery** - Explore studios across categories, keyword search, and location.
+- **Dynamic Filtering** - Filter by category and sort by price, rating, and latest listings.
+- **Pagination** - Load studio listings seamlessly with "Show More" pagination.
+- **Studio Details** - View detailed specs, amenities, studio rules, and host information.
+- **Studio Booking** - Reserve studio time slots with dynamic cost calculation.
+- **Collision Prevention** - Instant conflict warnings for overlapping confirmed reservations.
+- **Host Studio Management** - Add, edit, and delete studio spaces with modal confirmations.
+- **Booking Management** - Track reservations with color-coded status badges.
+- **Booking Cancellation** - Cancel pending reservations safely with confirmation modals.
+- **User Dashboard Stats** - View total bookings, owned studios, upcoming shoots, and total spent.
+- **Direct Image Upload** - Upload and host studio photos and profile avatars via ImgBB.
+- **Dark & Light Mode** - Toggle light and dark themes using next-themes and DaisyUI.
+- **Responsive UI** - Clean, mobile-friendly design built with Tailwind CSS v4.
+---
+
+## Client Tech Stack
+
+- **Framework:** Next.js 16.4.3 (App Router)
+- **Styling:** Tailwind CSS v4 & DaisyUI
+- **Authentication:** Better-Auth
+- **Icons:** React Icons
+- **Notifications:** React Hot Toast
+- **Carousels & Swipers:** Swiper
+- **Theme Management:** Next Themes
+
+---
+
+## Local Setup & Installation
+
+### Prerequisites
+- Node.js `v18.17.0` or higher (Node `v20+` recommended)
+- npm or pnpm or yarn
+- Running backend server on `http://localhost:5000`
+
+### Step 1: Navigate to Client Directory
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd client
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Step 2: Install Dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Step 3: Configure Environment Variables
+Create a `.env` file in the `client/` folder:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+BETTER_AUTH_SECRET=better_auth_secret
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_SERVER_URL=http://localhost:5000
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/studio_space?retryWrites=true&w=majority
+GOOGLE_CLIENT_ID=google_client_id
+GOOGLE_CLIENT_SECRET=google_client_secret
+```
 
-## Learn More
+### Step 4: Run Development Server
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+The application will be live at [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Step 5: Production Build
+```bash
+npm run build
+npm start
+```

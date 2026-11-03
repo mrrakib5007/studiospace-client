@@ -544,15 +544,8 @@ function ProfileCard({ user }) {
 }
 
 export default function ProfilePage() {
-  const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
-
-  useEffect(() => {
-    if (!isPending && !user) {
-      router.push("/login?callbackUrl=/profile");
-    }
-  }, [isPending, user, router]);
 
   if (isPending || !user) {
     return (

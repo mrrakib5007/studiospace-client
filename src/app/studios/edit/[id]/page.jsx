@@ -227,6 +227,7 @@ function EditStudioContent() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -520,15 +521,9 @@ function EditStudioContent() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
-                  Host & Creator Information (Read-only)
+                  Host & Creator Information
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  Host credentials are bound to the original owner and cannot be altered
-                </p>
               </div>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-brand/10 text-brand">
-                Listing Owner
-              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

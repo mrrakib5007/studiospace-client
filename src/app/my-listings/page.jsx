@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
 import {
@@ -21,7 +20,6 @@ import {
 const API_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function MyListingsPage() {
-  const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -29,13 +27,6 @@ export default function MyListingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [studioToDelete, setStudioToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Auth redirect
-  useEffect(() => {
-    if (!isPending && !user) {
-      router.push("/login?callbackUrl=/my-listings");
-    }
-  }, [isPending, user, router]);
 
   // Fetch studios owned by currently logged-in user
   useEffect(() => {
@@ -76,6 +67,7 @@ export default function MyListingsPage() {
     try {
       const res = await fetch(`${API_URL}/api/studios/${studioToDelete._id}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       const data = await res.json();

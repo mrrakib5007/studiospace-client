@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
 import {
@@ -72,7 +71,6 @@ function formatBookingDate(dateStr) {
 }
 
 export default function MyBookingsPage() {
-  const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -81,13 +79,6 @@ export default function MyBookingsPage() {
   const [activeTab, setActiveTab] = useState("All");
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
-
-  // Auth redirect
-  useEffect(() => {
-    if (!isPending && !user) {
-      router.push("/login?callbackUrl=/my-bookings");
-    }
-  }, [isPending, user, router]);
 
   // Fetch bookings for logged-in user
   useEffect(() => {
@@ -131,6 +122,7 @@ export default function MyBookingsPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
         }
       );
 

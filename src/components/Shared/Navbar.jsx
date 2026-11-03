@@ -26,11 +26,11 @@ const navLinks = [
   { name: "Home", href: "/" },
   { name: "Explore Studios", href: "/studios" },
   { name: "How It Works", href: "/#how-it-works" },
-  { name: "About Us", href: "/about" },
+  { name: "About Us", href: "/#about-us" },
 ];
 
 const userMenuItems = [
-  { name: "My Profile", href: "/profile", icon: FiUser },
+  { name: "Dashboard", href: "/profile", icon: FiUser },
   { name: "Add New Studio", href: "/add-studio", icon: FiPlusCircle },
   { name: "My Studio Listings", href: "/my-listings", icon: FiList },
   { name: "My Bookings", href: "/my-bookings", icon: FiCalendar },
@@ -51,6 +51,20 @@ const Navbar = () => {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const userPhoto = user?.image || user?.photoURL;
+
+  // Synchronize JWT in HTTPOnly cookie with server whenever user is authenticated
+  useEffect(() => {
+    if (user?.email) {
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/jwt`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: user.email, name: user.name }),
+      }).catch((err) => {
+        console.error("JWT sync error:", err);
+      });
+    }
+  }, [user?.email, user?.name]);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
@@ -130,8 +144,23 @@ const Navbar = () => {
     setIsUserMenuOpen(false);
     setIsOpen(false);
     try {
-      await signOut();
+      // Clear server-side HTTPOnly JWT cookie
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/logout`, {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => {});
+
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push("/login");
+            router.refresh();
+          },
+        },
+      });
       toast.success("Logged out successfully");
+      router.push("/login");
+      router.refresh();
     } catch (err) {
       console.error("Logout error:", err);
       toast.error("Failed to log out");
@@ -173,10 +202,21 @@ const Navbar = () => {
             <nav className="hidden md:flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
-              return (
+                return (
                   <Link
                     key={link.name}
                     href={link.href}
+                    onClick={(e) => {
+                      if (link.href.startsWith("/#") && pathname === "/") {
+                        const targetId = link.href.split("#")[1];
+                        const elem = document.getElementById(targetId);
+                        if (elem) {
+                          e.preventDefault();
+                          elem.scrollIntoView({ behavior: "smooth" });
+                          window.history.pushState(null, "", `#${targetId}`);
+                        }
+                      }
+                    }}
                     className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       active
                         ? "text-brand bg-brand/10 font-semibold"
@@ -504,7 +544,18 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    if (link.href.startsWith("/#") && pathname === "/") {
+                      const targetId = link.href.split("#")[1];
+                      const elem = document.getElementById(targetId);
+                      if (elem) {
+                        e.preventDefault();
+                        elem.scrollIntoView({ behavior: "smooth" });
+                        window.history.pushState(null, "", `#${targetId}`);
+                      }
+                    }
+                  }}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     active
                       ? "text-brand bg-brand/10 font-semibold"

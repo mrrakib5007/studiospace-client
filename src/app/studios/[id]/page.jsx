@@ -94,6 +94,7 @@ const StudioDetails = () => {
   const [startTime, setStartTime] = useState("10:00");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBookingSubmitting, setIsBookingSubmitting] = useState(false);
+  const [bookingConflictError, setBookingConflictError] = useState(null);
 
   // Fetch studio details by ID
   useEffect(() => {
@@ -155,6 +156,7 @@ const StudioDetails = () => {
       router.push(`/login?callbackUrl=/studios/${id}`);
       return;
     }
+    setBookingConflictError(null);
     setIsModalOpen(true);
   };
 
@@ -167,6 +169,7 @@ const StudioDetails = () => {
     }
 
     setIsBookingSubmitting(true);
+    setBookingConflictError(null);
     const toastId = toast.loading("Reserving studio slot...");
 
     try {
@@ -191,6 +194,7 @@ const StudioDetails = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(bookingData),
       });
 
@@ -206,6 +210,7 @@ const StudioDetails = () => {
       router.push("/my-bookings");
     } catch (err) {
       console.error("Booking error:", err);
+      setBookingConflictError(err.message || "Could not complete reservation.");
       toast.error(err.message || "Could not complete reservation.", {
         id: toastId,
       });
@@ -583,6 +588,17 @@ const StudioDetails = () => {
                   </span>
                 </div>
               </div>
+
+              {/* Double-Booking Collision Alert */}
+              {bookingConflictError && (
+                <div className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-xs">
+                  <FiAlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-bold block">Double-Booking Collision</span>
+                    <span className="leading-relaxed">{bookingConflictError}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 pt-3">

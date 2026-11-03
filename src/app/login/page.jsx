@@ -104,6 +104,14 @@ const LoginForm = () => {
         return;
       }
       if (data) {
+        // Issue JWT in HTTPOnly cookie on server
+        await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/jwt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email: formData.email }),
+        }).catch(() => {});
+
         setFormData({ email: "", password: "" });
         await toast.success("Logged in successfully!");
         router.push(redirectPath);

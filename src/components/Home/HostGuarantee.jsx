@@ -69,7 +69,13 @@ const trustStats = [
 
 const HostGuarantee = () => {
   return (
-    <section className="w-full py-16 sm:py-20 lg:py-24 bg-zinc-50/70 dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+    <section
+      id="about-us"
+      className="w-full py-16 sm:py-20 lg:py-24 bg-zinc-50/70 dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors scroll-mt-20 relative"
+    >
+      {/* Target anchors for #about and #host-guarantee */}
+      <span id="about" className="absolute -top-20" aria-hidden="true" />
+      <span id="host-guarantee" className="absolute -top-20" aria-hidden="true" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-14 sm:mb-16">
